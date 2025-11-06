@@ -4,7 +4,6 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
-using UnityEngine;
 
 [BurstCompile]
 public partial struct PlayerMovementSystem : ISystem
@@ -14,75 +13,86 @@ public partial struct PlayerMovementSystem : ISystem
 
 	private float timer;
 
+	private LocalTransform localTransform;
+	private PlayerInputComponent playerInputComponent;
+	private PlayerCollisionComponent playerCollisionComponent;
+
 	[BurstCompile]
 	public void OnCreate(ref SystemState state)
 	{
-		isJump = true;		
+		isJump = true;
 	}
 
 	[BurstCompile]
 	private void OnUpdate(ref SystemState state)
 	{
-		foreach (var (localTransform, playerInputComponent, playerControllerComponent, physicsVelocity) in SystemAPI.Query<RefRW<LocalTransform>, RefRW<PlayerInputComponent>, RefRW<PlayerControllerComponent>, RefRW<PhysicsVelocity>>())
+		foreach (var (localTransform, playerCollisionComponent, playerInputComponent, playerControllerComponent, physicsVelocity)
+			in SystemAPI.Query<RefRO<LocalTransform>,
+				RefRO<PlayerCollisionComponent>,
+				RefRO<PlayerInputComponent>,
+				RefRW<PlayerControllerComponent>,
+				RefRW<PhysicsVelocity>>())
 		{
-			MovementController(localTransform, playerInputComponent, playerControllerComponent, physicsVelocity, SystemAPI.Time.DeltaTime);
+			this.localTransform = localTransform.ValueRO;
+			this.playerInputComponent = playerInputComponent.ValueRO;
+			this.playerCollisionComponent = playerCollisionComponent.ValueRO;
 
-			CheckGround(localTransform, playerControllerComponent);
+			MovementController(playerControllerComponent, physicsVelocity, SystemAPI.Time.DeltaTime);
 
-			Jump(playerControllerComponent, playerInputComponent, physicsVelocity, SystemAPI.Time.DeltaTime);
+			CheckGround();
+
+			Jump(playerControllerComponent, physicsVelocity, SystemAPI.Time.DeltaTime);
 		}
 	}
 
 	[BurstCompile]
-	private float3 StartMove(RefRW<LocalTransform> localTransform, RefRW<PlayerControllerComponent> playerControllerComponent, float deltaTime, float2 input)
+	private float3 StartMove(RefRW<PlayerControllerComponent> playerControllerComponent, float deltaTime, float2 input)
 	{
-		return (localTransform.ValueRO.Right() * input.x + localTransform.ValueRO.Forward() * input.y)
+		return (localTransform.Right() * input.x + localTransform.Forward() * input.y)
 		* playerControllerComponent.ValueRO.speed * deltaTime;
 	}
 
 	[BurstCompile]
-	private void MovementController(RefRW<LocalTransform> localTransform, RefRW<PlayerInputComponent> playerInputComponent, RefRW<PlayerControllerComponent> playerControllerComponent, RefRW<PhysicsVelocity> physicsVelocity, float deltaTime)
+	private void MovementController(RefRW<PlayerControllerComponent> playerControllerComponent, RefRW<PhysicsVelocity> physicsVelocity, float deltaTime)
 	{
-		var inputDirection = playerInputComponent.ValueRO.directionInput;
-
+		var inputDirection = playerInputComponent.directionInput;
 		if (inputDirection.x != 0 || inputDirection.y != 0)
-			physicsVelocity.ValueRW.Linear.xz = StartMove(localTransform, playerControllerComponent, deltaTime, inputDirection).xz;
+			physicsVelocity.ValueRW.Linear.xz = StartMove(playerControllerComponent, deltaTime, inputDirection).xz;
 
 		else
 		{
-			 physicsVelocity.ValueRW.Angular.xz = 0;
-			 physicsVelocity.ValueRW.Linear.xz = 0;
+			physicsVelocity.ValueRW.Angular.xz = 0;
+			physicsVelocity.ValueRW.Linear.xz = 0;
 		}
-		playerControllerComponent.ValueRW.localPosition = localTransform.ValueRO.Position;
+
+		playerControllerComponent.ValueRW.localPosition = localTransform.Position;
 	}
 
 	[BurstCompile]
-	private void CheckGround(RefRW<LocalTransform> localTransform, RefRW<PlayerControllerComponent> playerControllerComponent)
+	private void CheckGround()
 	{
 		PhysicsWorldSingleton physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
 		NativeList<ColliderCastHit> hits = new NativeList<ColliderCastHit>(Allocator.Temp);
 
 		float3 cast = float3.zero;
-		float3 dir = -localTransform.ValueRO.Up();
+		float3 dir = -localTransform.Up();
 
-		Quaternion localRotation = Quaternion.Euler(cast);
-
-		var point1 = localTransform.ValueRW.Position;
-		var point2 = localTransform.ValueRW.Position;
+		var point1 = localTransform.Position + new float3(0, 0, 0) + dir * -playerCollisionComponent.height * 0.5f;
+		var point2 = point1 + dir * playerCollisionComponent.height;
 
 		isGround = physicsWorldSingleton.CapsuleCast(
 			point1,
 			point2,
-			0.5f,
+			playerCollisionComponent.radius,
 			dir,
-			playerControllerComponent.ValueRO.maxDistanceColliderCast,
+			playerCollisionComponent.maxDistanceColliderCast,
 			new CollisionFilter { BelongsTo = (uint)CollisionLayer.Player, CollidesWith = (uint)CollisionLayer.Collectable });
 	}
 
 	[BurstCompile]
-	private void Jump(RefRW<PlayerControllerComponent> playerControllerComponent, RefRW<PlayerInputComponent> playerInputComponent, RefRW<PhysicsVelocity> physicsVelocity, float deltaTime)
+	private void Jump(RefRW<PlayerControllerComponent> playerControllerComponent, RefRW<PhysicsVelocity> physicsVelocity, float deltaTime)
 	{
-		if (playerInputComponent.ValueRO.jumpInput && isGround && isJump)
+		if (playerInputComponent.jumpInput && isGround && isJump)
 		{
 			timer = playerControllerComponent.ValueRO.cdJump;
 
@@ -102,12 +112,4 @@ public partial struct PlayerMovementSystem : ISystem
 			}
 		}
 	}
-}
-
-public enum CollisionLayer
-{
-	Player = 1 << 6,
-	Collectable = 1 << 7,
-	Bullet = 1 << 8,
-	Enemy = 1 << 9,
 }

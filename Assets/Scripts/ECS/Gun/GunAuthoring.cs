@@ -37,5 +37,4 @@ public struct GunComponent : IComponentData
 	public Entity muzzle;
 
 	public float3 raycastDirection;
-
 }

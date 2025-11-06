@@ -1,0 +1,4 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Template name="progressBar" src="project://database/Assets/UI%20Toolkit/progressBar.uxml?fileID=9197481963319205126&amp;guid=e68286336b9b9824cac5fc37afc418b4&amp;type=3#progressBar" />
+    <ui:Instance template="progressBar" name="progressBar" />
+</ui:UXML>

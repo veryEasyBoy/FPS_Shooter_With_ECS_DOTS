@@ -2,7 +2,7 @@ using Cinemachine;
 using Unity.Entities;
 using UnityEngine;
 
-public class BridgeForEntity : MonoBehaviour
+public class PlayerIntoController : MonoBehaviour
 {
 	[SerializeField] private CinemachineVirtualCamera virtualCamera;
 	[SerializeField] private Camera cam;
@@ -14,7 +14,7 @@ public class BridgeForEntity : MonoBehaviour
 	private ShootRaycast raycastSpawn;
 
 	private void OnEnable()
-    {
+	{
 		virtualCamera.Follow = gameObject.transform;
 		virtualCamera.LookAt = gameObject.transform;
 

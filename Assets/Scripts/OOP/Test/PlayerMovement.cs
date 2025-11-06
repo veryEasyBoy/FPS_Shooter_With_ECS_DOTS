@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Zenject;
 
 public class PlayerMovementTest : MonoBehaviour
@@ -12,7 +13,7 @@ public class PlayerMovementTest : MonoBehaviour
 	[Inject]
 	private void Construct(DesktopInput inputActions)
 	{
-		Debug.Log("Create PlayerMovementTest");
+		Debug.Log("Create PlayerMovementTest OOP");
 		Debug.Log(inputActions);
 		this.inputActions = inputActions;
 	}
@@ -20,10 +21,13 @@ public class PlayerMovementTest : MonoBehaviour
 	private void Start()
 	{
 		rb = GetComponent<Rigidbody>();
+
 	}
 
 	public void OnEnable()
 	{
+		DiContainer container = ProjectContext.Instance.Container;
+		inputActions = container.Resolve<DesktopInput>();
 		inputActions.SetInputActions();
 	}
 

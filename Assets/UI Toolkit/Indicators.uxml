@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:Template name="progressBar" src="project://database/Assets/progressBar.uxml?fileID=9197481963319205126&amp;guid=a5413e34ba571d24ab866e9c7c170394&amp;type=3#progressBar" />
+    <Style src="project://database/Assets/StyleSheets/Indicators.uss?fileID=7433441132597879392&amp;guid=45d70cfe096e0f7418da65cfd57ee177&amp;type=3#Indicators" />
+    <ui:VisualElement style="flex-grow: 1; background-image: none;">
+        <ui:Instance template="progressBar" name="progressBar" class="health" style="-unity-background-image-tint-color: rgb(255, 255, 255); background-color: rgba(255, 255, 255, 0); opacity: 1; visibility: visible; overflow: visible; display: flex;" />
+    </ui:VisualElement>
+</ui:UXML>

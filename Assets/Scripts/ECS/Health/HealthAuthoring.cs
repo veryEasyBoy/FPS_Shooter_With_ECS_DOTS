@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class HealthAuthoring : MonoBehaviour
 {
-	[SerializeField] private float health;
+	[SerializeField] private HealthSO health;
 
 	public class Baker : Baker<HealthAuthoring>
 	{
@@ -13,8 +13,11 @@ public class HealthAuthoring : MonoBehaviour
 
 			AddComponent(entity, new HealthComponent
 			{
-				health = authoring.health,
+				currentHealth = authoring.health.MaxHealth,
+				maxHealth = authoring.health.MaxHealth,
 			});
+
+			AddComponent(entity, new HealthUiComponent { });
 
 		}
 	}
@@ -22,5 +25,11 @@ public class HealthAuthoring : MonoBehaviour
 
 public struct HealthComponent : IComponentData
 {
-	public float health;
+	public float currentHealth;
+	public float maxHealth;
+}
+
+public struct HealthUiComponent : IComponentData
+{
+	public bool canUpdateUi;
 }

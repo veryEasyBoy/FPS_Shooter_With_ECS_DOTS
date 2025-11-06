@@ -1,4 +1,3 @@
-using UnityEngine;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -9,13 +8,15 @@ using Unity.Transforms;
 [BurstCompile]
 public partial struct BulletSystem : ISystem
 {
-
 	[BurstCompile]
 	private void OnUpdate(ref SystemState state)
 	{
 		EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.Temp);
 
-		foreach (var (bulletComponent, physicsVelocity, localTransform) in SystemAPI.Query<RefRW<BulletComponent>, RefRW<PhysicsVelocity>, RefRW<LocalTransform>>())
+		foreach (var (bulletComponent, bulletCollision, localTransform) 
+			in SystemAPI.Query<RefRW<BulletComponent>, 
+			RefRO<BulletCollisionComponent>, 
+			RefRO<LocalTransform>>())
 		{
 			bulletComponent.ValueRW.timeExistence -= SystemAPI.Time.DeltaTime;
 
@@ -28,38 +29,40 @@ public partial struct BulletSystem : ISystem
 			NativeList<ColliderCastHit> hits = new NativeList<ColliderCastHit>(Allocator.Temp);
 
 			float3 cast = float3.zero;
-			float3 dir = -localTransform.ValueRO.Up();
+			float3 dir = localTransform.ValueRO.Up();
 
-			Quaternion localRotation = Quaternion.Euler(cast);
+			var point1 = localTransform.ValueRO.Position + new float3(0,0,0) + dir * -bulletCollision.ValueRO.height * 0.5f;
+			var point2 = point1 + dir * bulletCollision.ValueRO.height;
 
-			var point1 = localTransform.ValueRW.Position * (dir + (2/2));
-			var point2 = localTransform.ValueRW.Position * (-dir + (2 / 2));
-
-			var isGround = physicsWorldSingleton.CapsuleCastAll(
+			var isHit = physicsWorldSingleton.CapsuleCastAll(
 				point1,
 				point2,
-				0.5f,
+				bulletCollision.ValueRO.radius,
 				dir,
-				0f,
+				bulletCollision.ValueRO.maxDistanceColliderCast,
 				ref hits,
 				new CollisionFilter { BelongsTo = (uint)CollisionLayer.Bullet, CollidesWith = (uint)CollisionLayer.Enemy });
 
 			foreach (ColliderCastHit hit in hits)
 			{
-				if (hit.Entity != null && !bulletComponent.ValueRW.isHit)
+				if (!bulletComponent.ValueRO.isHit)
 				{
-					bulletComponent.ValueRW.isHit = true;
-					var health = state.EntityManager.GetComponentData<HealthComponent>(hit.Entity);
-					health.health -= 10f;
+					if (state.EntityManager.Exists(hit.Entity))
+					{
+						bulletComponent.ValueRW.isHit = true;
 
-					ecb.SetComponent(hit.Entity, health);
+						var health = state.EntityManager.GetComponentData<HealthComponent>(hit.Entity);
+						var healthUi = state.EntityManager.GetComponentData<HealthUiComponent>(hit.Entity);
 
-					Debug.Log(health.health);
-					if (health.health <= 0)
-						ecb.DestroyEntity(hit.Entity);
+						health.currentHealth -= bulletComponent.ValueRO.damage;
+						healthUi.canUpdateUi = true;
+
+						ecb.SetComponent(hit.Entity, health);
+						ecb.SetComponent(hit.Entity, healthUi);
+					}
 				}
-
 			}
+			hits.Clear();
 		}
 		ecb.Playback(state.EntityManager);
 	}

@@ -1,6 +1,5 @@
 using Unity.Burst;
 using Unity.Entities;
-using Unity.Transforms;
 using UnityEngine;
 
 public partial class ShootRaycast : SystemBase
@@ -10,7 +9,7 @@ public partial class ShootRaycast : SystemBase
 	[BurstCompile]
 	protected override void OnUpdate()
 	{
-		foreach (var (localTransform, gunComponent) in SystemAPI.Query<RefRW<LocalTransform>, RefRW<GunComponent>>())
+		foreach (var gunComponent in SystemAPI.Query<RefRW<GunComponent>>())
 		{
 			Ray ray = Camera.ViewportPointToRay(new Vector3(0.5f, 0.5f));
 			gunComponent.ValueRW.raycastDirection = ray.direction;

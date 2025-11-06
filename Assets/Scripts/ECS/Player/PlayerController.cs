@@ -11,7 +11,6 @@ public partial class PlayerController : SystemBase
 	private DesktopInput playerInput;
 
 	public float3 position;
-	public float2 input;
 
 	public quaternion rotation;
 
@@ -37,7 +36,7 @@ public partial class PlayerController : SystemBase
 	[BurstCompile]
 	protected override void OnUpdate()
 	{
-		foreach (var (localTransform, playerInputComponent, playerControllerComponent, rbComponent) in SystemAPI.Query<RefRW<LocalTransform>, RefRW<PlayerInputComponent>, RefRW<PlayerControllerComponent>, RefRW<PhysicsVelocity>>())
+		foreach (var (localTransform, playerInputComponent, playerControllerComponent) in SystemAPI.Query<RefRW<LocalTransform>, RefRW<PlayerInputComponent>, RefRW<PlayerControllerComponent>>())
 		{
 			playerInputComponent.ValueRW.directionInput = playerInput.DirectionInput;
 			playerInputComponent.ValueRW.jumpInput = playerInput.JumpInput;
