@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
-public class MainMenuManager : MonoBehaviour
+internal class MainMenuManager : MonoBehaviour
 {
     private UIDocument document;
 

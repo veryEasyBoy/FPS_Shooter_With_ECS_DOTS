@@ -3,7 +3,7 @@ using Unity.Entities;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class HealthManager : MonoBehaviour
+internal class HealthManager : MonoBehaviour
 {
 	[SerializeField] private HealthSO progressData;
 

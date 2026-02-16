@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.Health
 {
-	public class HealthAuthoring : MonoBehaviour
+	internal class HealthAuthoring : MonoBehaviour
 	{
 		[SerializeField] private HealthSO health;
 

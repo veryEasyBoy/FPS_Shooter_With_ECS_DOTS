@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.Guns
 {
-	public class GunAuthoring : MonoBehaviour
+	internal class GunAuthoring : MonoBehaviour
 	{
 		[SerializeField] private float fireCooldown;
 		[SerializeField] private float speed;

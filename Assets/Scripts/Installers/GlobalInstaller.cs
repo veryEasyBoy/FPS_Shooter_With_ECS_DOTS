@@ -3,7 +3,7 @@ using Zenject;
 
 namespace Assets.Scripts.Installers
 {
-	public class GlobalInstaller : MonoInstaller
+	internal class GlobalInstaller : MonoInstaller
 	{
 		public override void InstallBindings()
 		{

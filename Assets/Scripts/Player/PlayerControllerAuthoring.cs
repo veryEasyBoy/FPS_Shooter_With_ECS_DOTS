@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.Player
 {
-	public class PlayerControllerAuthoring : MonoBehaviour
+	internal class PlayerControllerAuthoring : MonoBehaviour
 	{
 		[SerializeField] private float speed;
 		[SerializeField] private float maxDistanceColliderCast;

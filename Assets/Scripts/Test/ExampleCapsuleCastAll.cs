@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ExampleCapsuleCastAll : MonoBehaviour
+internal class ExampleCapsuleCastAll : MonoBehaviour
 {
 	void Update()
 	{
