@@ -1213,7 +1213,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1d78b38807c8f34faf9229acd2e3a3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fireRate: 0.01
+  fireRate: 0
   speed: 300
   bullet: {fileID: 5746126415166561318, guid: 913e35e3972a9a24f9fb06d4d65fa41c, type: 3}
   muzzle: {fileID: 1951978129}
