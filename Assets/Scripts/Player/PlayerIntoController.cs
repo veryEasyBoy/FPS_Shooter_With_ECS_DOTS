@@ -1,17 +1,19 @@
-using Cinemachine;
+using Unity.Entities;
 using UnityEngine;
 
 namespace Assets.Scripts.Player
 {
 	internal class PlayerIntoController : MonoBehaviour
 	{
-		[SerializeField] private CinemachineVirtualCamera virtualCamera;
+		private Camera cameraPlayer;
+		private PlayerController playerController;
 
 		private void OnEnable()
 		{
-			Debug.Log("OnEnable");
-			virtualCamera.Follow = gameObject.transform;
-			virtualCamera.LookAt = gameObject.transform;
+			cameraPlayer = GetComponent<Camera>();
+
+			playerController = World.DefaultGameObjectInjectionWorld.GetOrCreateSystemManaged<PlayerController>();
+			playerController.m_CameraTarget = cameraPlayer.transform;
 		}
 	}
 }

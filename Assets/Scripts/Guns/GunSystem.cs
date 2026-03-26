@@ -14,7 +14,6 @@ namespace Assets.Scripts.Guns
 	{
 		public Camera Camera;
 
-		[BurstCompile]
 		protected override void OnUpdate()
 		{
 			foreach (var gunComponent in SystemAPI.Query<RefRW<GunComponent>>())

@@ -1,7 +1,6 @@
 using Assets.Scripts.InputActions;
 using Assets.Scripts.Physics;
 using Unity.Burst;
-using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
@@ -17,6 +16,8 @@ namespace Assets.Scripts.Player
 
 		private float timer;
 
+		private float2 lastDelta;
+
 		private LocalTransform localTransform;
 		private PlayerInputComponent playerInputComponent;
 		private PlayerCollisionComponent playerCollisionComponent;
@@ -31,15 +32,19 @@ namespace Assets.Scripts.Player
 		private void OnUpdate(ref SystemState state)
 		{
 			foreach (var (localTransform, playerCollisionComponent, playerInputComponent, playerControllerComponent, physicsVelocity)
-				in SystemAPI.Query<RefRO<LocalTransform>,
+				in SystemAPI.Query<RefRW<LocalTransform>,
 					RefRO<PlayerCollisionComponent>,
 					RefRO<PlayerInputComponent>,
 					RefRW<PlayerControllerComponent>,
 					RefRW<PhysicsVelocity>>())
 			{
-				this.localTransform = localTransform.ValueRO;
+				this.localTransform = localTransform.ValueRW;
 				this.playerInputComponent = playerInputComponent.ValueRO;
 				this.playerCollisionComponent = playerCollisionComponent.ValueRO;
+
+				physicsVelocity.ValueRW.Angular.xyz = 0;
+
+				RotatePlayer(playerInputComponent, localTransform, SystemAPI.Time.DeltaTime);
 
 				MovementController(playerControllerComponent, physicsVelocity, SystemAPI.Time.DeltaTime);
 
@@ -50,22 +55,52 @@ namespace Assets.Scripts.Player
 		}
 
 		[BurstCompile]
-		private float3 StartMove(RefRW<PlayerControllerComponent> playerControllerComponent, float deltaTime, float2 input)
+		private void RotatePlayer(RefRO<PlayerInputComponent> playerInputComponent, RefRW<LocalTransform> localTransform, float time)
 		{
+			if (playerInputComponent.ValueRO.rotationInput.y != 0f || playerInputComponent.ValueRO.rotationInput.x != 0)
+			{
+				if (lastDelta.x != playerInputComponent.ValueRO.rotationInput.x || lastDelta.y != playerInputComponent.ValueRO.rotationInput.y)
+				{
+					// Получаем ввод
+					float pitchDelta = playerInputComponent.ValueRO.rotationInput.y * 0.5f * -1; // Вверх-вниз
+					float yawDelta = playerInputComponent.ValueRO.rotationInput.x * 0.5f;   // Влево-вправо
+
+					// Получаем текущие углы
+					float3 currentEuler = math.degrees(math.Euler(localTransform.ValueRO.Rotation));
+
+					// Вычисляем новые углы
+					float newPitch = currentEuler.x - (pitchDelta * 10 * time);
+					float newYaw = currentEuler.y + (yawDelta * 10 * time);
+
+					// Ограничиваем Pitch
+					newPitch = math.clamp(newPitch, -45f, 45f);
+
+					// Применяем новое вращение
+					localTransform.ValueRW.Rotation = quaternion.Euler(math.radians(new float3(newPitch, newYaw, 0)));
+					lastDelta = playerInputComponent.ValueRO.rotationInput;
+				}
+			}
+		}
+
+		[BurstCompile]
+		private float3 StartMove(RefRW<PlayerControllerComponent> playerControllerComponent, float deltaTime, float2 input, RefRW<PhysicsVelocity> physicsVelocity)
+		{
+
 			return (localTransform.Right() * input.x + localTransform.Forward() * input.y)
 			* playerControllerComponent.ValueRO.speed * deltaTime;
+
 		}
 
 		[BurstCompile]
 		private void MovementController(RefRW<PlayerControllerComponent> playerControllerComponent, RefRW<PhysicsVelocity> physicsVelocity, float deltaTime)
 		{
+			
 			var inputDirection = playerInputComponent.directionInput;
 			if (inputDirection.x != 0 || inputDirection.y != 0)
-				physicsVelocity.ValueRW.Linear.xz = StartMove(playerControllerComponent, deltaTime, inputDirection).xz;
+				physicsVelocity.ValueRW.Linear.xz = StartMove(playerControllerComponent, deltaTime, inputDirection, physicsVelocity).xz;
 
 			else
 			{
-				physicsVelocity.ValueRW.Angular.xz = 0;
 				physicsVelocity.ValueRW.Linear.xz = 0;
 			}
 
@@ -76,7 +111,6 @@ namespace Assets.Scripts.Player
 		private void CheckGround()
 		{
 			PhysicsWorldSingleton physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
-			NativeList<ColliderCastHit> hits = new NativeList<ColliderCastHit>(Allocator.Temp);
 
 			float3 cast = float3.zero;
 			float3 dir = -localTransform.Up();

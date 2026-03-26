@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/DragPanel.uss?fileID=7433441132597879392&amp;guid=63572201d0acf9d4d8564748e8746579&amp;type=3#DragPanel" />
+    <ui:VisualElement style="flex-grow: 1; width: 50%; height: 50%; align-items: stretch; align-self: flex-end;">
+        <ui:VisualElement name="DragPanel" usage-hints="-1" tabindex="1" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%; height: 100%; overflow: hidden; visibility: visible;">
+                <ui:Button text="Fire" parse-escape-sequences="true" display-tooltip-when-elided="true" name="fire" tabindex="0" style="position: absolute; height: 12%; width: 10%; top: 60%; left: 80%; font-size: 30px;" />
+                <ui:Button text="Jump" parse-escape-sequences="true" display-tooltip-when-elided="true" name="jump" tabindex="0" style="position: absolute; height: 12%; width: 10%; top: 80%; left: 85%; font-size: 30px;" />
+                </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

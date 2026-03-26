@@ -15,6 +15,7 @@ namespace Assets.Scripts.Player
 		[SerializeField] private float height;
 		[SerializeField] private float radius;
 
+
 		private class Baker : Baker<PlayerControllerAuthoring>
 		{
 			public override void Bake(PlayerControllerAuthoring authoring)
@@ -47,6 +48,10 @@ namespace Assets.Scripts.Player
 	{
 		public float3 speed;
 		public float3 localPosition;
+
+		public float3 transform;
+
+		public Entity player;
 
 		public float cdJump;
 		public float jumpPower;

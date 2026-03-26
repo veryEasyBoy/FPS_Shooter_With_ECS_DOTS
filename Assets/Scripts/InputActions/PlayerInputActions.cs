@@ -53,6 +53,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Joystick"",
+                    ""type"": ""Value"",
+                    ""id"": ""cc2b341a-8819-4290-8209-a8378d3499dd"",
+                    ""expectedControlType"": ""Touch"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -143,6 +152,17 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""LMB"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6828465e-744c-4492-a750-18c7a94f7f54"",
+                    ""path"": ""<Touchscreen>/touch0"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Joystick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -154,6 +174,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Move_WASD = m_Move.FindAction("WASD", throwIfNotFound: true);
         m_Move_Jump = m_Move.FindAction("Jump", throwIfNotFound: true);
         m_Move_LMB = m_Move.FindAction("LMB", throwIfNotFound: true);
+        m_Move_Joystick = m_Move.FindAction("Joystick", throwIfNotFound: true);
     }
 
     ~@PlayerInputActions()
@@ -223,6 +244,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Move_WASD;
     private readonly InputAction m_Move_Jump;
     private readonly InputAction m_Move_LMB;
+    private readonly InputAction m_Move_Joystick;
     public struct MoveActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -230,6 +252,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         public InputAction @WASD => m_Wrapper.m_Move_WASD;
         public InputAction @Jump => m_Wrapper.m_Move_Jump;
         public InputAction @LMB => m_Wrapper.m_Move_LMB;
+        public InputAction @Joystick => m_Wrapper.m_Move_Joystick;
         public InputActionMap Get() { return m_Wrapper.m_Move; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -248,6 +271,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @LMB.started += instance.OnLMB;
             @LMB.performed += instance.OnLMB;
             @LMB.canceled += instance.OnLMB;
+            @Joystick.started += instance.OnJoystick;
+            @Joystick.performed += instance.OnJoystick;
+            @Joystick.canceled += instance.OnJoystick;
         }
 
         private void UnregisterCallbacks(IMoveActions instance)
@@ -261,6 +287,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @LMB.started -= instance.OnLMB;
             @LMB.performed -= instance.OnLMB;
             @LMB.canceled -= instance.OnLMB;
+            @Joystick.started -= instance.OnJoystick;
+            @Joystick.performed -= instance.OnJoystick;
+            @Joystick.canceled -= instance.OnJoystick;
         }
 
         public void RemoveCallbacks(IMoveActions instance)
@@ -283,5 +312,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnWASD(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnLMB(InputAction.CallbackContext context);
+        void OnJoystick(InputAction.CallbackContext context);
     }
 }

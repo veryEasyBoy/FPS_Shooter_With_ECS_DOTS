@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ActionScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/SampleScene/New Sub Scene.unity
+    guid: 1dc1abdc6334eae419bea5bf3ec66da4
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 72a582e4fcdd43c4a9f76b49aab1f3cf, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 348dbb1897f97404dac55917374c2b46, type: 3}

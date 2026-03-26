@@ -9,16 +9,16 @@ namespace Assets.Scripts.InputActions
 	public class DesktopInput
 	{
 		private PlayerInputActions inputActions;
-		public float2 DirectionInput { get; private set; }
-		public bool JumpInput { get; private set; }
-		public bool LMBInput { get; private set; }
+		public float2 DirectionInput { get; set; }
+		public bool JumpInput { get; set; }
+		public bool LMBInput { get; set; }
 
 		[Inject]
 		public void GetInputActions(PlayerInputActions inputActions)
 		{
 			this.inputActions = inputActions;
 
-			Debug.Log("Create PlayerInputActions");
+			Debug.Log("GetInputActions DesktopInput");
 			Debug.Log(inputActions);
 		}
 
@@ -33,7 +33,12 @@ namespace Assets.Scripts.InputActions
 			inputActions.Move.LMB.performed += ctx => LMBInput = ctx.ReadValueAsButton();
 			inputActions.Move.LMB.canceled += ctx => LMBInput = false;
 
+			inputActions.Move.Joystick.performed += ctx => DirectionInput = ctx.ReadValue<Vector2>();
+			inputActions.Move.Joystick.canceled += ctx => DirectionInput = Vector2.zero;
+
 			inputActions.Enable();
+
+			Debug.Log("Enable DesktopInput");
 		}
 
 		public void DeactivateInputActions()

@@ -21,7 +21,7 @@ internal class HealthManager : MonoBehaviour
 
 		var root = uiDocument.rootVisualElement;
 
-		progressBar = root.Q<ProgressBar>("progressBar");
+		progressBar = root.Q<ProgressBar>("health");
 		progressBar.visible = false;
 
 		healthSystem = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<HealthSystem>();
