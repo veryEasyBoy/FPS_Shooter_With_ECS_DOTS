@@ -7,6 +7,7 @@ using UnityEngine.UIElements;
 
 namespace Assets.Scripts.Player
 {
+	[DisableAutoCreation]
 	public partial class PlayerRotationPanelSystemBase : SystemBase
 	{
 		public Camera mainCamera;

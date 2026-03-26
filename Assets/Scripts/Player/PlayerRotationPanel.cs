@@ -19,14 +19,35 @@ namespace Assets.Scripts.Player
 
 		private PlayerRotationPanelSystemBase cameraRotationPanelSystemBase;
 
-		private void Start()
+		private void OnEnable()
 		{
-			cameraRotationPanelSystemBase = World.DefaultGameObjectInjectionWorld.GetOrCreateSystemManaged<PlayerRotationPanelSystemBase>();
-			cameraRotationPanelSystemBase.uiDocument = uiDocument;
-			cameraRotationPanelSystemBase.rotationSpeed = rotationSpeed;
-			cameraRotationPanelSystemBase.mainCamera = mainCamera;
-			cameraRotationPanelSystemBase.cameraTransform = cameraTransform;
-			cameraRotationPanelSystemBase.panelName = panelName;
+			if (cameraRotationPanelSystemBase == null)
+			{
+				cameraRotationPanelSystemBase = World.DefaultGameObjectInjectionWorld.CreateSystemManaged<PlayerRotationPanelSystemBase>();
+				Debug.Log("Create cameraRotationPanelSystemBase: " + cameraRotationPanelSystemBase);
+				cameraRotationPanelSystemBase.uiDocument = uiDocument;
+				cameraRotationPanelSystemBase.rotationSpeed = rotationSpeed;
+				cameraRotationPanelSystemBase.mainCamera = mainCamera;
+				cameraRotationPanelSystemBase.cameraTransform = cameraTransform;
+				cameraRotationPanelSystemBase.panelName = panelName;
+				cameraRotationPanelSystemBase.Enabled = true;
+
+				var world = World.DefaultGameObjectInjectionWorld;
+
+				var simulationSystemGroup = world.GetExistingSystemManaged<SimulationSystemGroup>();
+				simulationSystemGroup.AddSystemToUpdateList(cameraRotationPanelSystemBase);
+
+				Debug.Log("System added to SimulationSystemGroup");
+
+			}
+			else
+				cameraRotationPanelSystemBase.Enabled = true;
+		}
+
+		private void OnDestroy()
+		{
+			cameraRotationPanelSystemBase.Enabled = false;
+			Debug.LogWarning("cameraRotationPanelSystemBase.Enabled = false");
 		}
 	}
 }
